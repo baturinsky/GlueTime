@@ -1,0 +1,22 @@
+function init(self)
+	--require "builtins.scripts.mobdebug"
+	--dbg.start()
+	
+	msg.post("default:/loader#world1", "async_load")	    
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("proxy_loaded") then
+		msg.post(sender, "init")
+        msg.post(sender, "enable")
+        msg.post(sender, "acquire_input_focus")
+	elseif message_id == hash("proxy_unloaded") then
+		msg.post("default:/loader#world1", "load")
+	elseif message_id == hash("reset") then
+		init_globals()
+		local proxy = "default:/loader#world1"
+		msg.post(proxy, "disable")
+		msg.post(proxy, "final")
+		msg.post(proxy, "unload")
+	end
+end

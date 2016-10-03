@@ -1,0 +1,21 @@
+go.property("master", hash("."))
+
+local msg_set_master = hash("set_master")
+
+function init(self)
+	msg.post(".", "set_parent", {parent_id = self.master})	
+end
+
+
+function update(self, dt)
+	local master_rot = go.get_world_rotation(self.master)
+	master_rot.z = - master_rot.z
+	go.set_rotation(master_rot)
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == msg_set_master then
+		self.master = message.master
+		msg.post(".", "set_parent", {parent_id = self.master})
+	end    
+end

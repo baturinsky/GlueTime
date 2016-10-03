@@ -1,0 +1,82 @@
+require "lib/lib"
+
+go.property("master", hash("."))
+go.property("no_shadow", false)
+go.property("ghost_id", hash("ghost"))
+go.property("timer", 0)
+go.property("good", false)
+go.property("hp", 100)
+
+damage_sprites = {hash("none"), hash("1cracks"),hash("2cracks"), hash("3cracks"), hash("4cracks")}
+
+function co_used(self)
+	return self.good and "#good" or "#evil"
+end
+
+function init(self)
+
+	self.ghost = collidersById[self.ghost_id]
+	self.id = go.get_id()
+
+    msg.post(".", "set_parent", {parent_id = self.master})
+    msg.post("#sprite", "play_animation", {id = hash(self.ghost.sprite .. (self.ghost.good and "r" or ""))})
+    
+    if not self.no_shadow then
+    	self.shadow = factory.create("#shadow_factory", vmath.vector3(0, 0, 0.1) + go.get_position(), nil, {master = self.id})
+    end
+    
+    --sprite.set_hflip("#sprite", self.ghost.good)
+        
+end
+
+function showDamage(self)	
+
+	local damage = (1 - self.ghost.hp/self.ghost:max_hp()) * 100
+	
+	local damage_sprite = damage_sprites[math.floor(damage/20)+1]
+	
+	if damage_sprite and damage_sprite ~= self.damage_sprite then
+		msg.post(url(self.id,"cracks"), "play_animation", {id = damage_sprite})
+		self.damage_sprite = damage_sprite
+	end
+end
+
+function final(self)
+	if self.shadow then
+		go.delete(self.shadow)
+	end
+end
+
+function update(self, dt)
+	if game_stage ~= MAIN_STAGE then
+		return
+	end
+
+	ai_collider_update(self.ghost, self, dt)
+	showDamage(self)
+end
+
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("alignment") then
+		self.good = message.good
+		msg.post(self.good and "#evil" or "#good", "disable")
+		--sprite.set_hflip(url(self.id, "sprite", self.good))
+	elseif message_id == msg_contact_point_response then		
+		if message.distance > 1 or message.applied_impulse > 0.1 then
+			message.collider = go.get_id()
+			msg.post(self.master, "impact", message)
+		end
+	elseif message_id == msg_set_master then
+		self.master = message.master
+		msg.post(".", "set_parent", {parent_id = self.master})		
+	elseif message_id == hash("murder") then
+		if not self.ghost.tree then
+			self.ghost:destroy()
+			return
+		end
+		
+		self.ghost:deal_damage(message.damage)
+		
+	end	
+end

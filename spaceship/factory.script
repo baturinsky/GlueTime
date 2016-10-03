@@ -1,0 +1,27 @@
+local interval = 2
+local bonus_prob = 0.3
+
+function init(self)
+	self.timer = 1
+end
+
+function update(self, dt)
+
+	if game_stage ~= MAIN_STAGE then
+		return
+	end
+		
+	if not boss_present and game_time >= boss_time then
+		factory.create("#spaceship_factory", nil, nil, {boss = true})		
+	end 
+	
+	self.timer = self.timer - dt
+	if self.timer <= 0 and rigidn < 20 then
+		if game_time < boss_time then
+			self.timer = interval / (2.5 + game_time / 60) -- * (math.sin(game_time / 60) + 1)
+		else
+			self.timer = 10
+		end 
+		local l = factory.create("#spaceship_factory")
+	end
+end

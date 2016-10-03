@@ -1,0 +1,63 @@
+go.property("glue", 10)
+go.property("velocity", vmath.vector3())
+go.property("disabled", false)
+go.property("healing", false)
+
+function init(self)
+	go.set_scale(math.sqrt(self.glue) / 3 + 0.5)
+	self.id = go.get_id()
+	
+	go.animate("#sprite", "tint.w", go.PLAYBACK_ONCE_FORWARD, 0.2, go.EASING_INEXPO, 3, 0,
+		function(self, url, property)
+			go.delete()
+		end		
+	)
+	
+	self.velocity = vmath.vector3(math.random(-200, 0), math.random(-100, 100), 0)
+	
+	gluesById[go.get_id()] = self
+	
+	if self.healing then
+		self.disabled = true
+		go.animate(".", "position", go.PLAYBACK_ONCE_FORWARD, vmath.vector3(max_x * 0.25, max_y * 0.95, 0), go.EASING_LINEAR, 0.3, 0,
+			function(self, url, property)
+				go.delete()
+			end		 
+		)
+		--go.animate("#sprite", "tint", go.PLAYBACK_ONCE_FORWARD, vmath.vector4(1, 0, 0, 1), go.EASING_LINEAR, 1)
+	end
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == msg_trigger_response and not self.disabled then
+		local ghost = collidersById[message.other_id]
+		if ghost.type.capturing or ghost.tree.good then
+			play_sound("drop")				
+			msg.post("main#gui", "gain_glue")
+			protatree.glue = protatree.glue + self.glue
+			self.disabled = true
+			if ghost.tree.good then
+				go.animate(".", "position", go.PLAYBACK_ONCE_FORWARD, screen_to_world(vmath.vector3(screen_width/2, screen_height, 0)), go.EASING_LINEAR, 0.2, 0,
+					function(self, url, property)
+						go.delete()
+					end		 
+				)
+			else
+				go.delete()
+			end
+		end
+	end
+end
+
+function update(self, dt)
+	self.velocity = self.velocity * (1 / (1 + 0.2*dt))
+	
+	if vmath.length(self.velocity) > 200 then
+		self.velocity = vmath.normalize(self.velocity) * 200
+	end 
+	go.set_position(go.get_position() + self.velocity * dt)
+end
+
+function final(self)
+	gluesById[go.get_id()] = nil
+end

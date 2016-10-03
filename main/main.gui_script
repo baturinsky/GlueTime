@@ -1,0 +1,71 @@
+function init(self)
+	msg.post(".", "glue_time", {enabled=false})
+	gui.set_text(gui.get_node("story"), intro_text)
+	gui.set_enabled(gui.get_node("paused"), false)	
+end
+
+local function scale_down(self, node)
+	local s = 1.0
+	gui.animate(node, gui.PROP_SCALE, vmath.vector4(s, s, s, 0), gui.EASING_OUT, 0.05)
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("gain_glue") then
+		local s = 1.2
+		gui.animate(gui.get_node("glue"), gui.PROP_SCALE, vmath.vector4(s, s, s, 0), gui.EASING_OUT, 0.1, 0.0, scale_down)
+	elseif message_id == hash("set_difficulty") then
+		local s = 1.2
+		gui.set_text(gui.get_node("difficulty"), "Difficulty: " .. (settings.difficulty + 3))
+		gui.animate(gui.get_node("difficulty"), gui.PROP_SCALE, vmath.vector4(s, s, s, 0), gui.EASING_OUT, 0.1, 0.0, scale_down)
+	elseif message_id == hash("set_volume") then
+		gui.set_text(gui.get_node("volume"), "Volume: " .. (settings.volume))
+		gui.set_color(gui.get_node("volume"), vmath.vector4(1, 1, 1, 1))
+		gui.animate(gui.get_node("volume"), gui.PROP_COLOR, vmath.vector4(1, 1, 1, 0), gui.EASING_OUT, 2, 0.0)		
+	elseif message_id == hash("glue_time") then
+		gui.set_enabled(gui.get_node("glue_time"), message.enabled)
+		gui.set_enabled(gui.get_node("glue_time_tip"), message.enabled)
+	elseif message_id == hash("paused") then		
+		gui.set_enabled(gui.get_node("paused"), message.paused)				
+	elseif message_id == hash("start_game") then
+		gui.set_enabled(gui.get_node("story"), false)
+		--gui.set_color(gui.get_node("difficulty"), vmath.vector4(1, 1, 1, 0))
+	elseif message_id == hash("win") then
+		gui.set_enabled(gui.get_node("story"), true)
+		gui.set_text(gui.get_node("story"), win_text .. "\n\n" .. game_over_text)
+	elseif message_id == hash("boss_appears") and not game_over() then
+		gui.set_enabled(gui.get_node("story"), true)
+		gui.set_text(gui.get_node("story"), boss_tip)
+	elseif message_id == hash("boss_nude") and not game_over() then
+		gui.set_enabled(gui.get_node("story"), true)
+		gui.set_text(gui.get_node("story"), boss_nude_text)
+	elseif message_id == hash("game_over") then
+		gui.set_enabled(gui.get_node("story"), true)
+		
+		local text = boss_present and game_over_text_on_boss or game_over_text_before_boss
+		text = text .. "\n\n" .. game_over_text
+		
+		gui.set_text(gui.get_node("story"), text)
+	end
+end
+
+function update(self, dt)
+	if protatree then
+		gui.set_text(gui.get_node("hp"), tostring( math.floor(protatree.hp) .. "/" .. math.floor(protatree.max_hp) ))
+		gui.set_text(gui.get_node("glue"), tostring( math.floor(protatree.glue) .. "/" .. math.floor(protatree.max_glue) ))
+		gui.set_text(gui.get_node("time"), os.date("%H:%M:%S", math.floor(game_time + 19*3600)))	
+		if (protatree:can_into_glue() and not glue_time) ~= shown_glue_ready then
+			shown_glue_ready = not shown_glue_ready
+			gui.set_text(gui.get_node("glue_tip"), shown_glue_ready and "Press Space for Glue Time" or "glue")
+			if shown_glue_ready then
+				gui.set_color(gui.get_node("greenlight"), vmath.vector4(1,1,1,1))
+				gui.animate(gui.get_node("greenlight"), "color.w", 0.8, gui.EASING_LINEAR, 1, 0, nil, gui.PLAYBACK_LOOP_PINGPONG)
+			else
+				gui.set_color(gui.get_node("greenlight"), vmath.vector4(1,1,1,0))
+				gui.cancel_animation(gui.get_node("greenlight"), "color.w")
+			end
+		end
+		gui.set_text(gui.get_node("stats"), tostring( 
+		"mass: " .. math.floor(protatree.mass) .. " engine: " .. math.floor(protatree.engine) ..	" cannon: " .. math.floor(protatree.gun_power) -- .. " ships on screen: " .. rigidn
+		))
+	end
+end

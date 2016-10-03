@@ -1,0 +1,66 @@
+require "lib/lib"
+
+go.property("power", 100)
+go.property("scale", 1)
+go.property("target", vmath.vector3())
+go.property("homing_id", hash("."))
+go.property("no_particles", false)
+go.property("speed", 1)
+
+shotsn = 0
+
+function init(self)
+	if not self.no_particles then
+    	particlefx.play("#fires")    	
+    end
+    
+    go.set_scale(self.scale)
+
+	shotsn = shotsn + 1    
+	self.homing = rigidsById[self.homing_id]
+	self.die_in = 3
+    
+    if not self.homing then    
+    	local p = go.get_world_position()       
+		local push = vmath.normalize(vmath.vector3(self.target.x - p.x, self.target.y - p.y, 0)) * 30000 * self.speed
+		msg.post(".", "apply_force", {force = push * current_time_scale(), position = p})
+	end	
+	
+	self.hp = self.hp or self.power * 3
+	
+end
+
+function update(self, dt)	
+
+	local p = go.get_world_position()
+	self.die_in = self.die_in - dt
+	
+	if too_far(p) or self.die_in <= 0 or self.hp <= 0 then
+		go.delete()
+	end
+	
+	if self.homing then		
+		if self.homing.dead then
+			go.delete()
+		else
+			local push = vmath.normalize(vmath.vector3(self.homing.position.x - p.x, self.homing.position.y - p.y, 0)) * 500 * self.speed
+			msg.post(".", "apply_force", {force = push, position = p})				
+		end
+	end
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == msg_contact_point_response then
+		msg.post(message.other_id, "murder", {damage = self.power})
+		self.hp = self.hp - self.power
+		
+		if self.hp <= 0 or self.homing then
+			go.delete()
+		end
+	end
+end
+
+function final(self)	
+	shotsn = shotsn - 1 
+end
+

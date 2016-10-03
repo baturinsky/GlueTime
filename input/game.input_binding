@@ -1,0 +1,92 @@
+key_trigger {
+  input: KEY_UP
+  action: "up"
+}
+key_trigger {
+  input: KEY_DOWN
+  action: "down"
+}
+key_trigger {
+  input: KEY_LEFT
+  action: "left"
+}
+key_trigger {
+  input: KEY_RIGHT
+  action: "right"
+}
+key_trigger {
+  input: KEY_W
+  action: "up"
+}
+key_trigger {
+  input: KEY_S
+  action: "down"
+}
+key_trigger {
+  input: KEY_A
+  action: "left"
+}
+key_trigger {
+  input: KEY_D
+  action: "right"
+}
+key_trigger {
+  input: KEY_Q
+  action: "rot_left"
+}
+key_trigger {
+  input: KEY_E
+  action: "rot_right"
+}
+key_trigger {
+  input: KEY_SPACE
+  action: "glue"
+}
+key_trigger {
+  input: KEY_K
+  action: "reset"
+}
+key_trigger {
+  input: KEY_SPACE
+  action: "start"
+}
+key_trigger {
+  input: KEY_P
+  action: "pause"
+}
+key_trigger {
+  input: KEY_LSHIFT
+  action: "pause"
+}
+key_trigger {
+  input: KEY_N
+  action: "volume_up"
+}
+key_trigger {
+  input: KEY_M
+  action: "volume_down"
+}
+key_trigger {
+  input: KEY_B
+  action: "difficulty_up"
+}
+key_trigger {
+  input: KEY_V
+  action: "difficulty_down"
+}
+mouse_trigger {
+  input: MOUSE_BUTTON_LEFT
+  action: "mouse_left"
+}
+mouse_trigger {
+  input: MOUSE_BUTTON_RIGHT
+  action: "mouse_right"
+}
+gamepad_trigger {
+  input: GAMEPAD_LPAD_UP
+  action: "up"
+}
+gamepad_trigger {
+  input: GAMEPAD_RPAD_DOWN
+  action: "down"
+}

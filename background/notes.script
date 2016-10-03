@@ -1,0 +1,52 @@
+--[[
+There is no way to make txt file, so I'll use this
+
+Balls
+
+Cueball - you
+8-ball - enemy ai
+
+1-ball - does nothing, cheap to glue
+2-ball - light gun
+3-ball - thruster
+4-ball - armor
+5-ball - rocket
+6-ball - capacitor - buffs nearby units 
+7-ball - magnet
+
+9-ball - rubberball
+10-ball- EMP
+11-ball- bomb
+12-ball- shockwave
+
+
+
+collider 
+-friend/foe
+-sprite
+-kinetic
++shadow
+
+core
+-dynamic
+-astral
+
+
+Cueball - 30 glue, 300 hp, 3 engine, 3 mass 
+
+1 - "Rock", 10 glue, 100 hp, 1 engine, 1 mass, main cannon buff
+2 - "Pew pew", 20 glue, 100 hp, 1 engine, 2 mass
+3 - "Bull", 30 glue, 50 hp, 5 engine, 1 mass
+4 - "Armor", 40 glue, 500 hp, 1 engine, 3 mass
+5 - "Launcher", 50 glue, 100 hp, 1 engine, 2 mass
+6 - "Magnet", 60 glue, 200 hp, 1 engine, 2 mass
+7 - "Hub", 100 glue, 200 hp, 1 engine, 3 mass
+
+
+
+TODO:
+Damage
+Shockwave
+AI
+
+--]]

@@ -1,0 +1,4 @@
+images {
+  image: "/background/art/bg1600.png"
+}
+extrude_borders: 1
